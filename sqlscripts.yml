@@ -1,0 +1,9 @@
+dim_cliente: |
+  CREATE TABLE IF NOT EXISTS dim_cliente (
+      id_cliente INT PRIMARY KEY,
+      nombre_cliente VARCHAR(100),
+      tipo_cliente VARCHAR(50),
+      email VARCHAR(100),
+      telefono VARCHAR(30),
+      sector VARCHAR(100)
+  );
