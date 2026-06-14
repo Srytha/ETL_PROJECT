@@ -5,6 +5,6 @@ def load_cliente(dim_cliente: pd.DataFrame, etl_conn: Engine):
     dim_cliente.to_sql(
         'dim_cliente',
         etl_conn,
-        if_exists='append',
+        if_exists='replace',
         index=False
     )
