@@ -5,5 +5,45 @@ dim_cliente: |
       tipo_cliente VARCHAR(50),
       email VARCHAR(100),
       telefono VARCHAR(30),
-      sector VARCHAR(100)
+      sector VARCHAR(100),
+      saved DATE
+  );
+
+dim_sede: |
+  CREATE TABLE IF NOT EXISTS dim_sede (
+      id_sede INT PRIMARY KEY,
+      nombre_sede VARCHAR(100),
+      ciudad VARCHAR(100),
+      departamento VARCHAR(100),
+      direccion VARCHAR(200),
+      saved DATE
+  );
+
+dim_estado: |
+  CREATE TABLE IF NOT EXISTS dim_estado (
+      id_estado INT PRIMARY KEY,
+      nombre_estado VARCHAR(100),
+      descripcion VARCHAR(200),
+      saved DATE
+  );
+
+dim_novedad: |
+  CREATE TABLE IF NOT EXISTS dim_novedad (
+      id_novedad INT PRIMARY KEY,
+      tipo_novedad VARCHAR(100),
+      descripcion VARCHAR(200),
+      saved DATE
+  );
+
+dim_tiempo: |
+  CREATE TABLE IF NOT EXISTS dim_tiempo (
+      id_tiempo INT PRIMARY KEY,
+      fecha DATE,
+      año INT,
+      mes INT,
+      semana INT,
+      dia INT,
+      fin_de_semana BOOLEAN,
+      horas INT,
+      saved DATE
   );

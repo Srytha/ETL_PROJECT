@@ -1,5 +1,5 @@
 .idea
-*.txt
+node_modules
 config.yml
 confing.yml
 config_fill.yml

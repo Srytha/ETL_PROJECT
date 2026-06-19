@@ -46,12 +46,28 @@ if not tnames:
             conn.commit()
 
 
-# Extract
+
 df_cliente = extract.extract_cliente(source_conn)
-# Transform
 dim_cliente = transform.transform_cliente(df_cliente)
-# Load
 load.load_cliente(dim_cliente, dw_conn)
 print("Dimension cliente completado :v")
 
-#%%
+
+sede, ciudad, departamento = extract.extract_ubicacion(source_conn)
+dim_sede = transform.transform_ubicacion([sede, ciudad, departamento])
+load.load_sede(dim_sede, dw_conn)
+print("Dimension sede completado :v")
+
+df_estado = extract.extract_estado(source_conn)
+dim_estado = transform.transform_estado(df_estado)
+load.load_estado(dim_estado, dw_conn)
+print("Dimension estado completado :v")
+
+novedad, tipo_novedad = extract.extract_novedad(source_conn)
+dim_novedad = transform.transform_novedad([novedad, tipo_novedad])
+load.load_novedad(dim_novedad, dw_conn)
+print("Dimension novedad completado :v")
+
+dim_tiempo = transform.transform_fecha()
+load.load_tiempo(dim_tiempo, dw_conn)
+print("Dimension tiempo completado :v")
