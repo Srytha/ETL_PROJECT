@@ -85,3 +85,11 @@ def transform_fecha() -> pd.DataFrame:
     
     
     return dim_tiempo
+
+def transform_hora() -> pd.DataFrame:
+    dim_hora = pd.DataFrame({
+        "id_hora": range(24),
+        "hora": range(24)
+    })
+    
+    return dim_hora

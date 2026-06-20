@@ -40,7 +40,13 @@ def extract_tiempo(conection: Engine = None):
     dim_tiempo["semana"] = dim_tiempo["fecha"].dt.isocalendar().week
     dim_tiempo["dia"] = dim_tiempo["fecha"].dt.day
     dim_tiempo["fin_de_semana"] = dim_tiempo["fecha"].dt.weekday >= 5
-    dim_tiempo["horas"] = 24
     
     return dim_tiempo
 
+def extract_hora(conection: Engine = None):
+    dim_hora = pd.DataFrame({
+        "id_hora": pd.date_range(24),
+        "hora": pd.date_range(24)
+    })
+    
+    return dim_hora

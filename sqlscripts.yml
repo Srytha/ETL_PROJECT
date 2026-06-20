@@ -40,9 +40,22 @@ dim_tiempo: |
       semana INT,
       dia INT,
       fin_de_semana BOOLEAN,
-      horas INT,
       saved DATE
   );
+
+dim_hora: |
+  CREATE TABLE IF NOT EXISTS data_mart_entregas.dim_hora (
+      id_hora INT PRIMARY KEY,
+      hora INT,
+      saved DATE
+  );
+
+dim_hora_novedades: |
+  CREATE TABLE IF NOT EXISTS data_mart_novedades.dim_hora (
+      id_hora INT PRIMARY KEY,
+      hora INT,
+      saved DATE
+  );  
 
 dim_mensajero: |
   CREATE TABLE IF NOT EXISTS data_mart_entregas.dim_mensajero (
@@ -75,6 +88,5 @@ dim_tiempo_novedades: |
       semana INT,
       dia INT,
       fin_de_semana BOOLEAN,
-      horas INT,
       saved DATE
   );

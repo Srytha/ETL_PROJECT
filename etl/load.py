@@ -44,3 +44,10 @@ def load_mensajero_novedades(dim_mensajero: pd.DataFrame, etl_conn: Engine):
 
 def load_tiempo_novedades(dim_tiempo: pd.DataFrame, etl_conn: Engine):
     load_table(dim_tiempo, "dim_tiempo", "data_mart_novedades", etl_conn)
+
+
+def load_hora(dim_hora: pd.DataFrame, etl_conn: Engine):
+    load_table(dim_hora, "dim_hora", "data_mart_entregas", etl_conn)
+
+def load_hora_novedades(dim_hora: pd.DataFrame, etl_conn: Engine):
+    load_table(dim_hora, "dim_hora", "data_mart_novedades", etl_conn)
