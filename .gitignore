@@ -1,8 +1,5 @@
 .idea
 node_modules
-config.yml
-confing.yml
-config_fill.yml
 *.db
 test*
 *.csv

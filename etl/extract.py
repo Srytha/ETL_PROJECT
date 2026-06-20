@@ -20,6 +20,12 @@ def extract_ubicacion(conection: Engine):
     departamento = pd.read_sql_table('departamento', conection)
     return [sede, ciudad, departamento]
 
+def extract_mensajero(conection: Engine):
+    dim_mensajero = pd.read_sql_table('clientes_mensajeroaquitoy', conection)
+    return dim_mensajero
+
+
+
 
 # Revisar 
 def extract_tiempo(conection: Engine = None):
@@ -38,4 +44,3 @@ def extract_tiempo(conection: Engine = None):
     
     return dim_tiempo
 
-# Falta mensajero
