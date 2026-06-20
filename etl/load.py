@@ -2,9 +2,7 @@ import pandas as pd
 from sqlalchemy.engine import Engine
 
 
-# =========================
-# FUNCIÓN GENÉRICA DE CARGA
-# =========================
+
 def load_table(df: pd.DataFrame, table: str, schema: str, etl_conn: Engine):
     df.to_sql(
         name=table,
@@ -14,10 +12,6 @@ def load_table(df: pd.DataFrame, table: str, schema: str, etl_conn: Engine):
         index=False
     )
 
-
-# =========================
-# DATA MART 1: ENTREGAS
-# =========================
 
 def load_cliente(dim_cliente: pd.DataFrame, etl_conn: Engine):
     load_table(dim_cliente, "dim_cliente", "data_mart_entregas", etl_conn)
@@ -39,9 +33,6 @@ def load_tiempo(dim_tiempo: pd.DataFrame, etl_conn: Engine):
     load_table(dim_tiempo, "dim_tiempo", "data_mart_entregas", etl_conn)
 
 
-# =========================
-# DATA MART 2: NOVEDADES
-# =========================
 
 def load_novedad(dim_novedad: pd.DataFrame, etl_conn: Engine):
     load_table(dim_novedad, "dim_novedad", "data_mart_novedades", etl_conn)
