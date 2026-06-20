@@ -27,7 +27,7 @@ def transform_sede(args) -> pd.DataFrame:
     df_dim_sede = pd.merge(sede, ciudad, on='ciudad_id', how='left')
     df_dim_sede = pd.merge(df_dim_sede, departamento, on='departamento_id', how='left')
     
-    df_dim_sede= pd.DataFrame()
+    #df_dim_sede= pd.DataFrame()
     df_dim_sede["id_sede"] = df_dim_sede["sede_id"]
     df_dim_sede["nombre_sede"] = df_dim_sede["nombre_x"]
     df_dim_sede["ciudad"] = df_dim_sede["nombre_y"]
@@ -51,17 +51,25 @@ def transform_estado(df_estado: pd.DataFrame) -> pd.DataFrame:
 def transform_novedad(args) -> pd.DataFrame:
     novedad, tipo_novedad = args
     
-    df_dim_novedad = pd.merge(novedad, tipo_novedad, left_on='tipo_novedad_id', right_on='id', how='left')
+    df_merged = pd.merge(novedad, tipo_novedad, left_on='tipo_novedad_id', right_on='id', how='left')
     
     df_dim_novedad = pd.DataFrame()
-    df_dim_novedad["id_novedad"] = df_dim_novedad["id_x"]
-    df_dim_novedad["tipo_novedad"] = df_dim_novedad["nombre"]
-    df_dim_final["descripcion"] = df_dim_novedad["descripcion"]
+    df_dim_novedad["id_novedad"] = df_merged["id_x"]
+    df_dim_novedad["tipo_novedad"] = df_merged["nombre"]
+    df_dim_novedad["descripcion"] = df_merged["descripcion"]
     
-    df_dim_final = df_dim_final.drop_duplicates(subset=["id_novedad"])
+    df_dim_novedad = df_dim_novedad.drop_duplicates(subset=["id_novedad"])
 
     
-    return df_dim_final
+    return df_dim_novedad
+
+def transform_mensajero(df_mensajero: pd.DataFrame) -> pd.DataFrame:
+    df = df_mensajero.copy()
+    df_dim_mensajero = pd.DataFrame()
+    df_dim_mensajero["id_mensajero"] = df["datos_id"]
+    
+    df_dim_mensajero = df_dim_mensajero.drop_duplicates(subset=["id_mensajero"])
+    return df_dim_mensajero
 
 def transform_fecha() -> pd.DataFrame:
   

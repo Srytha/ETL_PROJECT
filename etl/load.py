@@ -37,6 +37,15 @@ def load_sede(dim_sede: pd.DataFrame, engine_destino: Engine):
         if_exists='replace',
         index=False
     )
+
+def load_mensajero(dim_mensajero: pd.DataFrame, engine_destino: Engine):
+
+    dim_mensajero.to_sql(
+        'dim_mensajero',
+        con=engine_destino,
+        if_exists='replace',
+        index=False
+    )
     
 def load_tiempo(dim_tiempo: pd.DataFrame, engine_destino: Engine):
 

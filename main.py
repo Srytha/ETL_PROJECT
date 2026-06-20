@@ -54,7 +54,7 @@ print("Dimension cliente completado :v")
 
 
 sede, ciudad, departamento = extract.extract_ubicacion(source_conn)
-dim_sede = transform.transform_ubicacion([sede, ciudad, departamento])
+dim_sede = transform.transform_sede([sede, ciudad, departamento])
 load.load_sede(dim_sede, dw_conn)
 print("Dimension sede completado :v")
 
@@ -67,6 +67,11 @@ novedad, tipo_novedad = extract.extract_novedad(source_conn)
 dim_novedad = transform.transform_novedad([novedad, tipo_novedad])
 load.load_novedad(dim_novedad, dw_conn)
 print("Dimension novedad completado :v")
+
+df_mensajero = extract.extract_mensajero(source_conn)
+dim_mensajero = transform.transform_mensajero(df_mensajero)
+load.load_mensajero(dim_mensajero, dw_conn)
+print("Dimension mensajero completado :v")
 
 dim_tiempo = transform.transform_fecha()
 load.load_tiempo(dim_tiempo, dw_conn)
