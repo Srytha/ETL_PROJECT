@@ -95,7 +95,7 @@ def transform_hora() -> pd.DataFrame:
     
     return dim_hora
 
-def transform_hecho_novedad(df_novedad: pd.DataFrame) -> pd.DataFrame:
+def transform_hecho_novedad(df_novedad: pd.DataFrame, dim_tiempo: pd.DataFrame) -> pd.DataFrame:
 
     hecho = pd.DataFrame()
 
@@ -107,8 +107,11 @@ def transform_hecho_novedad(df_novedad: pd.DataFrame) -> pd.DataFrame:
     # FK dim_mensajero
     hecho["id_mensajero"] = df_novedad["mensajero_id"]
 
-    # FK dim_tiempo
-    hecho["id_tiempo"] = range(1, len(hecho) + 1)
+    # Fecha sin hora ni zona horaria para el merge con dim_tiempo
+    hecho["fecha"] = (pd.to_datetime(df_novedad["fecha_novedad"]).dt.tz_localize(None).dt.normalize())
+
+    # Merge para obtener el id_tiempo correcto
+    hecho = hecho.merge(dim_tiempo[["fecha", "id_tiempo"]], on="fecha", how="left")
 
     # FK dim_hora
     hecho["id_hora"] = pd.to_datetime(df_novedad["fecha_novedad"]).dt.hour
@@ -122,4 +125,6 @@ def transform_hecho_novedad(df_novedad: pd.DataFrame) -> pd.DataFrame:
     # fecha de carga
     hecho["saved"] = pd.Timestamp.today().date()
 
+    hecho.drop(columns=["fecha"], inplace=True)
+    
     return hecho

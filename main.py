@@ -99,7 +99,7 @@ print("Dimension hora completado :v")
 
 # Hecho Novedad
 df_hecho_novedad = extract.extract_hecho_novedad(source_conn)
-hecho_novedad = transform.transform_hecho_novedad(df_hecho_novedad)
+hecho_novedad = transform.transform_hecho_novedad(df_hecho_novedad, dim_tiempo)
 load.load_hecho_novedad(hecho_novedad,dw_conn)
 print("Hecho novedad completado :v")
 
@@ -115,7 +115,8 @@ with dw_conn.connect() as conn:
         'data_mart_novedades.dim_novedad',
         'data_mart_novedades.dim_mensajero',
         'data_mart_novedades.dim_tiempo',
-        'data_mart_novedades.dim_hora'
+        'data_mart_novedades.dim_hora',
+        'data_mart_novedades.hecho_novedad',
     ]
     
     for tabla in tablas:
