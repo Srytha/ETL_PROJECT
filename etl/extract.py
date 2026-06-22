@@ -24,6 +24,9 @@ def extract_mensajero(conection: Engine):
     dim_mensajero = pd.read_sql_table('clientes_mensajeroaquitoy', conection)
     return dim_mensajero
 
+def extract_hecho_novedad(conection: Engine):
+    hecho_novedad = pd.read_sql_table('mensajeria_novedadesservicio', conection)
+    return hecho_novedad
 
 
 
@@ -34,7 +37,7 @@ def extract_tiempo(conection: Engine = None):
         "fecha": pd.date_range(start='2023-09-19', end='2024-08-31', freq='D')
     })
     
-    dim_tiempo["id_tiempo"] = dim_tiempo["fecha"].dt.strftime("%Y%m%d").astype(int)
+    dim_tiempo["id_tiempo"] = range(1, len(dim_tiempo) + 1)
     dim_tiempo["año"] = dim_tiempo["fecha"].dt.year
     dim_tiempo["mes"] = dim_tiempo["fecha"].dt.month
     dim_tiempo["semana"] = dim_tiempo["fecha"].dt.isocalendar().week

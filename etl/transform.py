@@ -77,6 +77,7 @@ def transform_fecha() -> pd.DataFrame:
         "fecha": pd.date_range(start='09/19/2023', end='31/08/2024', freq='D')
     })
     
+    dim_tiempo["id_tiempo"] = range(1, len(dim_tiempo) + 1)
     dim_tiempo["año"] = dim_tiempo["fecha"].dt.year
     dim_tiempo["mes"] = dim_tiempo["fecha"].dt.month
     dim_tiempo["dia"] = dim_tiempo["fecha"].dt.day
@@ -93,3 +94,32 @@ def transform_hora() -> pd.DataFrame:
     })
     
     return dim_hora
+
+def transform_hecho_novedad(df_novedad: pd.DataFrame) -> pd.DataFrame:
+
+    hecho = pd.DataFrame()
+
+    hecho["id_novedad_servicio"] = df_novedad["id"]
+
+    # FK dim_novedad
+    hecho["id_novedad"] = df_novedad["tipo_novedad_id"]
+
+    # FK dim_mensajero
+    hecho["id_mensajero"] = df_novedad["mensajero_id"]
+
+    # FK dim_tiempo
+    hecho["id_tiempo"] = range(1, len(hecho) + 1)
+
+    # FK dim_hora
+    hecho["id_hora"] = pd.to_datetime(df_novedad["fecha_novedad"]).dt.hour
+
+    # dimensión degenerada
+    hecho["cod_servicio"] = df_novedad["servicio_id"]
+
+    # medida
+    hecho["cantidad_novedades"] = 1
+
+    # fecha de carga
+    hecho["saved"] = pd.Timestamp.today().date()
+
+    return hecho

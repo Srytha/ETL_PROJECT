@@ -4,7 +4,7 @@ mensajeria_bd:
   user: postgres
   password: 
   host: localhost
-  port: 5432
+  port: 5433
 
 etl_mensajeria:
   drivername: postgresql
@@ -12,7 +12,7 @@ etl_mensajeria:
   user: postgres
   password: 
   host: localhost
-  port:  5432
+  port: 5433
 
 LOAD_DIMENSIONS:
   True

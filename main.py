@@ -97,6 +97,12 @@ print("Dimension tiempo completado :v")
 load.load_hora_novedades(dim_hora, dw_conn)
 print("Dimension hora completado :v")
 
+# Hecho Novedad
+df_hecho_novedad = extract.extract_hecho_novedad(source_conn)
+hecho_novedad = transform.transform_hecho_novedad(df_hecho_novedad)
+load.load_hecho_novedad(hecho_novedad,dw_conn)
+print("Hecho novedad completado :v")
+
 
 with dw_conn.connect() as conn:
     tablas = [

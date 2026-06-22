@@ -90,3 +90,15 @@ dim_tiempo_novedades: |
       fin_de_semana BOOLEAN,
       saved DATE
   );
+
+hecho_novedad: |
+  CREATE TABLE IF NOT EXISTS data_mart_novedades.hecho_novedad (
+      id_novedad_servicio INT PRIMARY KEY,
+      id_novedad INT,
+      id_mensajero INT,
+      id_tiempo INT,
+      id_hora INT,
+      cod_servicio INT,
+      cantidad_novedades INT,
+      saved DATE
+  );

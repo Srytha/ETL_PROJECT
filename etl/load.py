@@ -51,3 +51,6 @@ def load_hora(dim_hora: pd.DataFrame, etl_conn: Engine):
 
 def load_hora_novedades(dim_hora: pd.DataFrame, etl_conn: Engine):
     load_table(dim_hora, "dim_hora", "data_mart_novedades", etl_conn)
+
+def load_hecho_novedad(hecho_novedad: pd.DataFrame,etl_conn: Engine):
+    load_table(hecho_novedad,"hecho_novedad","data_mart_novedades",etl_conn)
