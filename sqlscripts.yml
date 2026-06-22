@@ -102,3 +102,14 @@ hecho_novedad: |
       cantidad_novedades INT,
       saved DATE
   );
+
+hecho_seguimiento_estado: |
+  CREATE TABLE IF NOT EXISTS data_mart_entregas.hecho_seguimiento_estado (
+      id_estado_servicio INT PRIMARY KEY,
+      id_estado INT,
+      id_mensajero INT,
+      id_tiempo_estado_inicio INT,
+      id_tiempo_estado_fin INT,
+      duracion_tiempo_estado INT,
+      cod_servicio INT
+  );

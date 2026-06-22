@@ -81,6 +81,12 @@ dim_hora = transform.transform_hora()
 load.load_hora(dim_hora, dw_conn)
 print("Dimension hora completado :v")
 
+df_seguimiento, df_servicios = extract.extract_hecho_seguimiento_estado(source_conn)
+dim_tiempo_df = transform.transform_fecha()
+hecho_seguimiento = transform.transform_hecho_seguimiento_estado([df_seguimiento, df_servicios], dim_tiempo_df)
+load.load_hecho_seguimiento_estado(hecho_seguimiento, dw_conn)
+print("Hecho seguimiento estado completado :v")
+
 # DataMart 2
 print("DataMart 2")
 novedad, tipo_novedad = extract.extract_novedad(source_conn)

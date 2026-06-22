@@ -123,3 +123,57 @@ def transform_hecho_novedad(df_novedad: pd.DataFrame) -> pd.DataFrame:
     hecho["saved"] = pd.Timestamp.today().date()
 
     return hecho
+
+
+def transform_hecho_seguimiento_estado(args, dim_tiempo: pd.DataFrame) -> pd.DataFrame:
+    df, servicios = args
+    df = df.copy()
+    
+    # traer mensajero_id desde mensajeria_servicio
+    df = df.merge(servicios[['id', 'mensajero_id']], left_on='servicio_id', right_on='id', how='left')
+    df['mensajero_id'] = df['mensajero_id'].fillna(0).astype(int)
+    
+    # combinar fecha y hora en un datetime
+    df['datetime'] = pd.to_datetime(df['fecha'].astype(str) + ' ' + df['hora'].astype(str), format='mixed')    
+    # ordenar por servicio y datetime
+    df = df.sort_values(['servicio_id', 'datetime']).reset_index(drop=True)
+    
+    # calcular datetime_fin
+    df['datetime_fin'] = df.groupby('servicio_id')['datetime'].shift(-1)
+    
+    # duracion en minutos
+    df['duracion_tiempo_estado'] = (
+        (df['datetime_fin'] - df['datetime'])
+        .dt.total_seconds()
+        .div(60)
+        .fillna(0)
+        .astype(int)
+    )
+    
+    # join dim_tiempo para inicio
+    dim_tiempo_join = dim_tiempo[['id_tiempo', 'fecha']].copy()
+    dim_tiempo_join['fecha'] = pd.to_datetime(dim_tiempo_join['fecha'])
+    
+    df['fecha_inicio'] = df['datetime'].dt.normalize()
+    df = df.merge(dim_tiempo_join, left_on='fecha_inicio', right_on='fecha', how='left')
+    df = df.rename(columns={'id_tiempo': 'id_tiempo_estado_inicio'})
+    
+    # join dim_tiempo para fin
+    df['fecha_fin'] = df['datetime_fin'].dt.normalize()
+    df = df.merge(dim_tiempo_join, left_on='fecha_fin', right_on='fecha', how='left')
+    df = df.rename(columns={'id_tiempo': 'id_tiempo_estado_fin'})
+    
+    # ultimo estado sin fin
+    df['id_tiempo_estado_fin'] = df['id_tiempo_estado_fin'].fillna(1).astype(int)
+    
+    # construir hecho final
+    hecho = pd.DataFrame()
+    hecho['id_estado_servicio']      = df['id_x']  
+    hecho['id_estado']               = df['estado_id']
+    hecho['id_mensajero']            = df['mensajero_id']
+    hecho['id_tiempo_estado_inicio'] = df['id_tiempo_estado_inicio'].astype(int)
+    hecho['id_tiempo_estado_fin']    = df['id_tiempo_estado_fin']
+    hecho['duracion_tiempo_estado']  = df['duracion_tiempo_estado']
+    hecho['cod_servicio']            = df['servicio_id']
+    
+    return hecho
