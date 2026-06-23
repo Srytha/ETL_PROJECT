@@ -12,8 +12,8 @@ pd.set_option('display.max_columns', 100)
 
 with open('config.yml', 'r') as f:
     config = yaml.safe_load(f)
-    config_source = config['mensajeria_bd']
-    config_dw = config['etl_mensajeria']
+    config_source = config['SOURCE_DB']
+    config_dw = config['ETL_PRO']
 
 
 url_source = (
@@ -30,7 +30,6 @@ source_conn = create_engine(url_source)
 dw_conn = create_engine(url_dw)
 
 # Crear esquemas y tablas
-
 
 conn = psycopg2.connect(
         dbname=config_dw['dbname'],
@@ -89,8 +88,8 @@ print("Hecho seguimiento estado completado :v")
 
 # DataMart 2
 print("DataMart 2")
-novedad, tipo_novedad = extract.extract_novedad(source_conn)
-dim_novedad = transform.transform_novedad([novedad, tipo_novedad])
+tipo_novedad = extract.extract_novedad(source_conn)
+dim_novedad = transform.transform_novedad(tipo_novedad)
 load.load_novedad(dim_novedad, dw_conn)
 print("Dimension novedad completado :v")
 
@@ -105,7 +104,7 @@ print("Dimension hora completado :v")
 
 # Hecho Novedad
 df_hecho_novedad = extract.extract_hecho_novedad(source_conn)
-hecho_novedad = transform.transform_hecho_novedad(df_hecho_novedad)
+hecho_novedad = transform.transform_hecho_novedad(df_hecho_novedad, dim_tiempo)
 load.load_hecho_novedad(hecho_novedad,dw_conn)
 print("Hecho novedad completado :v")
 
@@ -121,7 +120,8 @@ with dw_conn.connect() as conn:
         'data_mart_novedades.dim_novedad',
         'data_mart_novedades.dim_mensajero',
         'data_mart_novedades.dim_tiempo',
-        'data_mart_novedades.dim_hora'
+        'data_mart_novedades.dim_hora',
+        'data_mart_novedades.hecho_novedad',
     ]
     
     for tabla in tablas:
