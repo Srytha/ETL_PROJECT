@@ -30,33 +30,13 @@ source_conn = create_engine(url_source)
 dw_conn = create_engine(url_dw)
 
 # Crear esquemas y tablas
-# First, connect to default postgres DB to create the target DB if needed
-try:
-    conn_default = psycopg2.connect(
-        dbname='postgres',
-        user=config_dw['user'],
-        password=config_dw['password'],
-        host=config_dw['host'],
-        port=config_dw['port']
-    )
-    cur_default = conn_default.cursor()
-    cur_default.execute("SELECT 1 FROM pg_database WHERE datname = %s", (config_dw['dbname'],))
-    if not cur_default.fetchone():
-        print(f"Creating database {config_dw['dbname']}...")
-        cur_default.execute(f"CREATE DATABASE {config_dw['dbname']}")
-        conn_default.commit()
-    cur_default.close()
-    conn_default.close()
-except Exception as e:
-    print(f"Warning: Could not pre-create database: {e}")
 
-# Now connect to the target database
 conn = psycopg2.connect(
         dbname=config_dw['dbname'],
         user=config_dw['user'],
         password=config_dw['password'],
         host=config_dw['host'],
-        port=int(config_dw['port'])
+        port=config_dw['port']
     )
 
 cur = conn.cursor()
@@ -129,10 +109,10 @@ load.load_hecho_novedad(hecho_novedad,dw_conn)
 print("Hecho novedad completado :v")
 
 #Hecho Servicio
-
 df_servicio, df_usuario = extract.extract_hecho_servicio(source_conn)
+df_estados, df_servicios = extract.extract_hecho_seguimiento_estado(source_conn)
 dim_tiempo_df = transform.transform_fecha()
-hecho_servicio = transform.transform_hecho_servicio([df_servicio, df_usuario], dim_tiempo_df)
+hecho_servicio = transform.transform_hecho_servicio([df_servicio, df_usuario, df_estados], dim_tiempo_df)
 load.load_hecho_servicio(hecho_servicio, dw_conn)
 print("Hecho servicio completado :v")
 

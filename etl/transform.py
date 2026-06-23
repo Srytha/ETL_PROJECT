@@ -164,7 +164,7 @@ def transform_hecho_seguimiento_estado(args, dim_tiempo: pd.DataFrame) -> pd.Dat
     return hecho
 
 def transform_hecho_servicio(args, dim_tiempo: pd.DataFrame) -> pd.DataFrame:
-    servicio, usuario = args
+    servicio, usuario, estados = args
 
     df = pd.merge(servicio, usuario[['id', 'sede_id']], left_on='usuario_id', right_on='id', how='left')
 
@@ -172,17 +172,25 @@ def transform_hecho_servicio(args, dim_tiempo: pd.DataFrame) -> pd.DataFrame:
         df['fecha_solicitud'].astype(str) + ' ' + df['hora_solicitud'].astype(str),
         format='mixed'
     )
-    df['datetime_deseada'] = pd.to_datetime(
-        df['fecha_deseada'].astype(str) + ' ' + df['hora_deseada'].astype(str),
-        format='mixed'
+    estados['fecha_str'] = pd.to_datetime(estados['fecha']).dt.strftime('%Y-%m-%d')
+    estados['hora_str']  = estados['hora'].astype(str).str.split('.').str[0]
+    estados['datetime']  = pd.to_datetime(
+        estados['fecha_str'] + ' ' + estados['hora_str'],
+        format='%Y-%m-%d %H:%M:%S'
     )
-    df['duracion_servicio'] = (
-        (df['datetime_deseada'] - df['datetime_solicitud'])
+
+    duracion = estados.groupby('servicio_id')['datetime'].agg(
+        inicio='min', fin='max'
+    ).reset_index()
+    duracion['duracion_servicio'] = (
+        (duracion['fin'] - duracion['inicio'])
         .dt.total_seconds()
         .div(60)
         .fillna(0)
+        .round()
         .astype(int)
     )
+    df = pd.merge(df, duracion[['servicio_id', 'duracion_servicio']], left_on='id_x', right_on='servicio_id', how='left')
 
     dim_tiempo_join = dim_tiempo[['id_tiempo', 'fecha']].copy()
     dim_tiempo_join['fecha'] = pd.to_datetime(dim_tiempo_join['fecha'])
@@ -199,7 +207,7 @@ def transform_hecho_servicio(args, dim_tiempo: pd.DataFrame) -> pd.DataFrame:
     hecho['id_hora']           = df['datetime_solicitud'].dt.hour
     hecho['id_mensajero']      = df['mensajero_id']
     hecho['cod_servicio']      = df['id_x']
-    hecho['duracion_servicio'] = df['duracion_servicio']
+    hecho['duracion_servicio'] = df['duracion_servicio'].fillna(0).astype(int)
     hecho['total_servicios']   = 1
 
     hecho = hecho[df['es_prueba'] == False].reset_index(drop=True)
