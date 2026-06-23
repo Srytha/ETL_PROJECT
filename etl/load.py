@@ -55,3 +55,6 @@ def load_hecho_novedad(hecho_novedad: pd.DataFrame,etl_conn: Engine):
 
 def load_hecho_seguimiento_estado(hecho: pd.DataFrame, etl_conn: Engine):
     load_table(hecho, "hecho_seguimiento_estado", "data_mart_entregas", etl_conn)
+
+def load_hecho_servicio(hecho_servicio: pd.DataFrame, etl_conn: Engine):
+    load_table(hecho_servicio, "hecho_servicio", "data_mart_entregas", etl_conn)

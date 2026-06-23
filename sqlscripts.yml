@@ -113,3 +113,16 @@ hecho_seguimiento_estado: |
       id_hora INT,
       cod_servicio INT
   );
+
+hecho_servicio: |
+  CREATE TABLE IF NOT EXISTS data_mart_entregas.hecho_servicio (
+      id_hecho_servicio INT PRIMARY KEY,
+      id_cliente INT,
+      id_sede INT,
+      id_tiempo INT,
+      id_hora INT,
+      id_mensajero INT,
+      cod_servicio INT,
+      duracion_servicio INT,
+      total_servicios INT
+  );
