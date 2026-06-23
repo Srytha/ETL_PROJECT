@@ -110,5 +110,6 @@ hecho_seguimiento_estado: |
       id_tiempo_estado_inicio INT,
       id_tiempo_estado_fin INT,
       duracion_tiempo_estado INT,
+      id_hora INT,
       cod_servicio INT
   );

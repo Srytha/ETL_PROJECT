@@ -158,6 +158,7 @@ def transform_hecho_seguimiento_estado(args, dim_tiempo: pd.DataFrame) -> pd.Dat
     hecho['id_tiempo_estado_inicio'] = df['id_tiempo_estado_inicio'].astype(int)
     hecho['id_tiempo_estado_fin']    = df['id_tiempo_estado_fin']
     hecho['duracion_tiempo_estado']  = df['duracion_tiempo_estado']
+    hecho['id_hora']                 = df['datetime'].dt.hour
     hecho['cod_servicio']            = df['servicio_id']
     
     return hecho

@@ -84,21 +84,24 @@ docker exec -it etl_postgres psql -U postgres -c "CREATE DATABASE etl_mensajeria
 ### config.yml for Docker
 
 ```yaml
-mensajeria_bd:
+SOURCE_DB:
   drivername: postgresql
-  dbname: mensajeria_bd
+  dbname: mensajeria
   user: postgres
   password: postgres
   host: localhost
   port: 5433
 
-etl_mensajeria:
+ETL_PRO:
   drivername: postgresql
   dbname: etl_mensajeria
   user: postgres
   password: postgres
   host: localhost
   port: 5433
+
+LOAD_DIMENSIONS:
+  True
 ```
 
 ### Stop and remove containers

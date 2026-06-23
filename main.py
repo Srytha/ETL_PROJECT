@@ -117,6 +117,7 @@ with dw_conn.connect() as conn:
         'data_mart_entregas.dim_estado',
         'data_mart_entregas.dim_tiempo',
         'data_mart_entregas.dim_hora',
+        'data_mart_entregas.hecho_seguimiento_estado',
         'data_mart_novedades.dim_novedad',
         'data_mart_novedades.dim_mensajero',
         'data_mart_novedades.dim_tiempo',
