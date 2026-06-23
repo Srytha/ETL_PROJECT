@@ -54,3 +54,8 @@ def extract_hora(conection: Engine = None):
     })
     
     return dim_hora
+
+def extract_hecho_servicio(conection: Engine):
+    servicio = pd.read_sql_table('mensajeria_servicio', conection)
+    usuario = pd.read_sql_table('clientes_usuarioaquitoy', conection)
+    return [servicio, usuario]

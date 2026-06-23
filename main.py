@@ -10,7 +10,7 @@ pd.set_option('display.max_columns', 100)
 
 # Conexion a base de datos
 
-with open('config.yml', 'r') as f:
+with open('config.yml', 'r', encoding='utf-8') as f:
     config = yaml.safe_load(f)
     config_source = config['SOURCE_DB']
     config_dw = config['ETL_PRO']
@@ -30,17 +30,37 @@ source_conn = create_engine(url_source)
 dw_conn = create_engine(url_dw)
 
 # Crear esquemas y tablas
-
-conn = psycopg2.connect(
-        dbname=config_dw['dbname'],
+# First, connect to default postgres DB to create the target DB if needed
+try:
+    conn_default = psycopg2.connect(
+        dbname='postgres',
         user=config_dw['user'],
         password=config_dw['password'],
         host=config_dw['host'],
         port=config_dw['port']
     )
+    cur_default = conn_default.cursor()
+    cur_default.execute("SELECT 1 FROM pg_database WHERE datname = %s", (config_dw['dbname'],))
+    if not cur_default.fetchone():
+        print(f"Creating database {config_dw['dbname']}...")
+        cur_default.execute(f"CREATE DATABASE {config_dw['dbname']}")
+        conn_default.commit()
+    cur_default.close()
+    conn_default.close()
+except Exception as e:
+    print(f"Warning: Could not pre-create database: {e}")
+
+# Now connect to the target database
+conn = psycopg2.connect(
+        dbname=config_dw['dbname'],
+        user=config_dw['user'],
+        password=config_dw['password'],
+        host=config_dw['host'],
+        port=int(config_dw['port'])
+    )
 
 cur = conn.cursor()
-with open('sqlscripts.yml', 'r') as f:
+with open('sqlscripts.yml', 'r', encoding='utf-8') as f:
         sql = yaml.safe_load(f)
         for val in sql.values():
             cur.execute(val)
@@ -108,6 +128,13 @@ hecho_novedad = transform.transform_hecho_novedad(df_hecho_novedad, dim_tiempo)
 load.load_hecho_novedad(hecho_novedad,dw_conn)
 print("Hecho novedad completado :v")
 
+#Hecho Servicio
+
+df_servicio, df_usuario = extract.extract_hecho_servicio(source_conn)
+dim_tiempo_df = transform.transform_fecha()
+hecho_servicio = transform.transform_hecho_servicio([df_servicio, df_usuario], dim_tiempo_df)
+load.load_hecho_servicio(hecho_servicio, dw_conn)
+print("Hecho servicio completado :v")
 
 with dw_conn.connect() as conn:
     tablas = [
@@ -118,11 +145,13 @@ with dw_conn.connect() as conn:
         'data_mart_entregas.dim_tiempo',
         'data_mart_entregas.dim_hora',
         'data_mart_entregas.hecho_seguimiento_estado',
+        'data_mart_entregas.hecho_servicio',
         'data_mart_novedades.dim_novedad',
         'data_mart_novedades.dim_mensajero',
         'data_mart_novedades.dim_tiempo',
         'data_mart_novedades.dim_hora',
         'data_mart_novedades.hecho_novedad',
+        
     ]
     
     for tabla in tablas:

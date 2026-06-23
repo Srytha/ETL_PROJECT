@@ -162,3 +162,45 @@ def transform_hecho_seguimiento_estado(args, dim_tiempo: pd.DataFrame) -> pd.Dat
     hecho['cod_servicio']            = df['servicio_id']
     
     return hecho
+
+def transform_hecho_servicio(args, dim_tiempo: pd.DataFrame) -> pd.DataFrame:
+    servicio, usuario = args
+
+    df = pd.merge(servicio, usuario[['id', 'sede_id']], left_on='usuario_id', right_on='id', how='left')
+
+    df['datetime_solicitud'] = pd.to_datetime(
+        df['fecha_solicitud'].astype(str) + ' ' + df['hora_solicitud'].astype(str),
+        format='mixed'
+    )
+    df['datetime_deseada'] = pd.to_datetime(
+        df['fecha_deseada'].astype(str) + ' ' + df['hora_deseada'].astype(str),
+        format='mixed'
+    )
+    df['duracion_servicio'] = (
+        (df['datetime_deseada'] - df['datetime_solicitud'])
+        .dt.total_seconds()
+        .div(60)
+        .fillna(0)
+        .astype(int)
+    )
+
+    dim_tiempo_join = dim_tiempo[['id_tiempo', 'fecha']].copy()
+    dim_tiempo_join['fecha'] = pd.to_datetime(dim_tiempo_join['fecha'])
+    df['fecha_solicitud_norm'] = pd.to_datetime(df['fecha_solicitud']).dt.normalize()
+    df = df.merge(dim_tiempo_join, left_on='fecha_solicitud_norm', right_on='fecha', how='left')
+
+    df['mensajero_id'] = df['mensajero_id'].fillna(0).astype(int)
+
+    hecho = pd.DataFrame()
+    hecho['id_hecho_servicio'] = df['id_x']
+    hecho['id_cliente']        = df['cliente_id']
+    hecho['id_sede']           = df['sede_id']
+    hecho['id_tiempo']         = df['id_tiempo'].fillna(1).astype(int)
+    hecho['id_hora']           = df['datetime_solicitud'].dt.hour
+    hecho['id_mensajero']      = df['mensajero_id']
+    hecho['cod_servicio']      = df['id_x']
+    hecho['duracion_servicio'] = df['duracion_servicio']
+    hecho['total_servicios']   = 1
+
+    hecho = hecho[df['es_prueba'] == False].reset_index(drop=True)
+    return hecho
