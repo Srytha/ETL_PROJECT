@@ -66,9 +66,8 @@ dim_mensajero: |
 
 dim_novedad: |
   CREATE TABLE IF NOT EXISTS data_mart_novedades.dim_novedad (
-      id_novedad INT PRIMARY KEY,
+      id_tipo_novedad INT PRIMARY KEY,
       tipo_novedad VARCHAR(100),
-      descripcion VARCHAR(200),
       saved DATE
   );
 
@@ -94,7 +93,7 @@ dim_tiempo_novedades: |
 hecho_novedad: |
   CREATE TABLE IF NOT EXISTS data_mart_novedades.hecho_novedad (
       id_novedad_servicio INT PRIMARY KEY,
-      id_novedad INT,
+      id_tipo_novedad INT,
       id_mensajero INT,
       id_tiempo INT,
       id_hora INT,
@@ -102,3 +101,5 @@ hecho_novedad: |
       cantidad_novedades INT,
       saved DATE
   );
+
+  

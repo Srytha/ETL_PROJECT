@@ -12,8 +12,8 @@ pd.set_option('display.max_columns', 100)
 
 with open('config.yml', 'r') as f:
     config = yaml.safe_load(f)
-    config_source = config['mensajeria_bd']
-    config_dw = config['etl_mensajeria']
+    config_source = config['SOURCE_DB']
+    config_dw = config['ETL_PRO']
 
 
 url_source = (
@@ -30,7 +30,6 @@ source_conn = create_engine(url_source)
 dw_conn = create_engine(url_dw)
 
 # Crear esquemas y tablas
-
 
 conn = psycopg2.connect(
         dbname=config_dw['dbname'],
@@ -83,8 +82,8 @@ print("Dimension hora completado :v")
 
 # DataMart 2
 print("DataMart 2")
-novedad, tipo_novedad = extract.extract_novedad(source_conn)
-dim_novedad = transform.transform_novedad([novedad, tipo_novedad])
+tipo_novedad = extract.extract_novedad(source_conn)
+dim_novedad = transform.transform_novedad(tipo_novedad)
 load.load_novedad(dim_novedad, dw_conn)
 print("Dimension novedad completado :v")
 

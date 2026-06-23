@@ -48,18 +48,13 @@ def transform_estado(df_estado: pd.DataFrame) -> pd.DataFrame:
     df_dim_estado = df_dim_estado.drop_duplicates(subset=["id_estado"])
     return df_dim_estado
 
-def transform_novedad(args) -> pd.DataFrame:
-    novedad, tipo_novedad = args
-    
-    df_merge = pd.merge(novedad, tipo_novedad, left_on='tipo_novedad_id', right_on='id', how='left')
-    
-    df_dim_novedad = pd.DataFrame()
-    df_dim_novedad["id_novedad"] = df_merge["id_x"]
-    df_dim_novedad["tipo_novedad"] = df_merge["nombre"]
-    df_dim_novedad["descripcion"] = df_merge["descripcion"]
-    
-    df_dim_novedad = df_dim_novedad.drop_duplicates(subset=["id_novedad"])
+def transform_novedad(df_novedad: pd.DataFrame) -> pd.DataFrame:
+    df = df_novedad.copy()
 
+    df_dim_novedad = pd.DataFrame()
+    df_dim_novedad["id_tipo_novedad"] = df["id"]
+    df_dim_novedad["tipo_novedad"] = df["nombre"]
+    
     return df_dim_novedad
 
 
@@ -100,30 +95,16 @@ def transform_hecho_novedad(df_novedad: pd.DataFrame, dim_tiempo: pd.DataFrame) 
     hecho = pd.DataFrame()
 
     hecho["id_novedad_servicio"] = df_novedad["id"]
-
-    # FK dim_novedad
-    hecho["id_novedad"] = df_novedad["tipo_novedad_id"]
-
-    # FK dim_mensajero
+    hecho["id_tipo_novedad"] = df_novedad["tipo_novedad_id"]
     hecho["id_mensajero"] = df_novedad["mensajero_id"]
-
-    # Fecha sin hora ni zona horaria para el merge con dim_tiempo
-    hecho["fecha"] = (pd.to_datetime(df_novedad["fecha_novedad"]).dt.tz_localize(None).dt.normalize())
-
-    # Merge para obtener el id_tiempo correcto
-    hecho = hecho.merge(dim_tiempo[["fecha", "id_tiempo"]], on="fecha", how="left")
-
-    # FK dim_hora
+    hecho["fecha"] = pd.to_datetime(df_novedad["fecha_novedad"], utc=True).dt.tz_convert(None).dt.normalize()    
+    hecho = hecho.merge(dim_tiempo[["fecha", "id_tiempo"]],on="fecha", how="left")
     hecho["id_hora"] = pd.to_datetime(df_novedad["fecha_novedad"]).dt.hour
-
-    # dimensión degenerada
     hecho["cod_servicio"] = df_novedad["servicio_id"]
 
-    # medida
+  
     hecho["cantidad_novedades"] = 1
 
-    # fecha de carga
-    hecho["saved"] = pd.Timestamp.today().date()
 
     hecho.drop(columns=["fecha"], inplace=True)
     

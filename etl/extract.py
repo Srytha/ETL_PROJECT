@@ -10,9 +10,8 @@ def extract_estado(conection: Engine):
     return dim_estado
 
 def extract_novedad(conection: Engine):
-    novedad = pd.read_sql_table('mensajeria_novedadesservicio', conection)
     tipo_novedad = pd.read_sql_table('mensajeria_tiponovedad', conection)
-    return [novedad, tipo_novedad]
+    return tipo_novedad
 
 def extract_ubicacion(conection: Engine):
     sede = pd.read_sql_table('sede', conection)
@@ -29,8 +28,6 @@ def extract_hecho_novedad(conection: Engine):
     return hecho_novedad
 
 
-
-# Revisar 
 def extract_tiempo(conection: Engine = None):
 
     dim_tiempo = pd.DataFrame({

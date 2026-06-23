@@ -2,7 +2,6 @@ import pandas as pd
 from sqlalchemy.engine import Engine
 
 
-
 def load_table(df: pd.DataFrame, table: str, schema: str, etl_conn: Engine):
     df.to_sql(
         name=table,
@@ -33,7 +32,6 @@ def load_tiempo(dim_tiempo: pd.DataFrame, etl_conn: Engine):
     load_table(dim_tiempo, "dim_tiempo", "data_mart_entregas", etl_conn)
 
 
-
 def load_novedad(dim_novedad: pd.DataFrame, etl_conn: Engine):
     load_table(dim_novedad, "dim_novedad", "data_mart_novedades", etl_conn)
 
@@ -54,3 +52,4 @@ def load_hora_novedades(dim_hora: pd.DataFrame, etl_conn: Engine):
 
 def load_hecho_novedad(hecho_novedad: pd.DataFrame,etl_conn: Engine):
     load_table(hecho_novedad,"hecho_novedad","data_mart_novedades",etl_conn)
+    
