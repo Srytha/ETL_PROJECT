@@ -27,6 +27,10 @@ def extract_hecho_novedad(conection: Engine):
     hecho_novedad = pd.read_sql_table('mensajeria_novedadesservicio', conection)
     return hecho_novedad
 
+def extract_hecho_seguimiento_estado(conection: Engine):
+    estados = pd.read_sql_table('mensajeria_estadosservicio', conection)
+    servicios = pd.read_sql_table('mensajeria_servicio', conection)
+    return [estados, servicios]
 
 def extract_tiempo(conection: Engine = None):
 
