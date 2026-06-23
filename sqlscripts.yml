@@ -1,5 +1,9 @@
+crear_esquemas: |
+  CREATE SCHEMA IF NOT EXISTS data_mart_entregas;
+  CREATE SCHEMA IF NOT EXISTS data_mart_novedades;
+
 dim_cliente: |
-  CREATE TABLE IF NOT EXISTS dim_cliente (
+  CREATE TABLE IF NOT EXISTS data_mart_entregas.dim_cliente (
       id_cliente INT PRIMARY KEY,
       nombre_cliente VARCHAR(100),
       tipo_cliente VARCHAR(50),
@@ -10,7 +14,7 @@ dim_cliente: |
   );
 
 dim_sede: |
-  CREATE TABLE IF NOT EXISTS dim_sede (
+  CREATE TABLE IF NOT EXISTS data_mart_entregas.dim_sede (
       id_sede INT PRIMARY KEY,
       nombre_sede VARCHAR(100),
       ciudad VARCHAR(100),
@@ -20,23 +24,15 @@ dim_sede: |
   );
 
 dim_estado: |
-  CREATE TABLE IF NOT EXISTS dim_estado (
+  CREATE TABLE IF NOT EXISTS data_mart_entregas.dim_estado (
       id_estado INT PRIMARY KEY,
       nombre_estado VARCHAR(100),
       descripcion VARCHAR(200),
       saved DATE
   );
 
-dim_novedad: |
-  CREATE TABLE IF NOT EXISTS dim_novedad (
-      id_novedad INT PRIMARY KEY,
-      tipo_novedad VARCHAR(100),
-      descripcion VARCHAR(200),
-      saved DATE
-  );
-
 dim_tiempo: |
-  CREATE TABLE IF NOT EXISTS dim_tiempo (
+  CREATE TABLE IF NOT EXISTS data_mart_entregas.dim_tiempo (
       id_tiempo INT PRIMARY KEY,
       fecha DATE,
       año INT,
@@ -44,6 +40,66 @@ dim_tiempo: |
       semana INT,
       dia INT,
       fin_de_semana BOOLEAN,
-      horas INT,
       saved DATE
   );
+
+dim_hora: |
+  CREATE TABLE IF NOT EXISTS data_mart_entregas.dim_hora (
+      id_hora INT PRIMARY KEY,
+      hora INT,
+      saved DATE
+  );
+
+dim_hora_novedades: |
+  CREATE TABLE IF NOT EXISTS data_mart_novedades.dim_hora (
+      id_hora INT PRIMARY KEY,
+      hora INT,
+      saved DATE
+  );  
+
+dim_mensajero: |
+  CREATE TABLE IF NOT EXISTS data_mart_entregas.dim_mensajero (
+      id_mensajero INT PRIMARY KEY,
+      activo BOOLEAN,
+      saved DATE
+  );
+
+dim_novedad: |
+  CREATE TABLE IF NOT EXISTS data_mart_novedades.dim_novedad (
+      id_tipo_novedad INT PRIMARY KEY,
+      tipo_novedad VARCHAR(100),
+      saved DATE
+  );
+
+dim_mensajero_novedades: |
+  CREATE TABLE IF NOT EXISTS data_mart_novedades.dim_mensajero (
+      id_mensajero INT PRIMARY KEY,
+      activo BOOLEAN,
+      saved DATE
+  );
+
+dim_tiempo_novedades: |
+  CREATE TABLE IF NOT EXISTS data_mart_novedades.dim_tiempo (
+      id_tiempo INT PRIMARY KEY,
+      fecha DATE,
+      año INT,
+      mes INT,
+      semana INT,
+      dia INT,
+      fin_de_semana BOOLEAN,
+      saved DATE
+  );
+
+hecho_novedad: |
+  CREATE TABLE IF NOT EXISTS data_mart_novedades.hecho_novedad (
+      id_novedad_servicio INT PRIMARY KEY,
+      id_tipo_novedad INT,
+      id_mensajero INT,
+      id_tiempo INT,
+      id_hora INT,
+      cod_servicio INT,
+      cantidad_novedades INT,
+      saved DATE
+  );
+
+  

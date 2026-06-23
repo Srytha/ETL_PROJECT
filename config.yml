@@ -1,0 +1,19 @@
+SOURCE_DB:
+  drivername: postgresql
+  dbname: mensajeria
+  user: postgres
+  password: 
+  host: localhost
+  port: 5432
+
+ETL_PRO:
+  drivername: postgresql
+  dbname: etl_mensajeria
+  user: postgres
+  password: 
+  host: localhost
+  port: 5432
+
+LOAD_DIMENSIONS:
+  True
+
