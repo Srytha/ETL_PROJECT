@@ -54,7 +54,7 @@ def transform_novedad(df_novedad: pd.DataFrame) -> pd.DataFrame:
     df_dim_novedad = pd.DataFrame()
     df_dim_novedad["id_tipo_novedad"] = df["id"]
     df_dim_novedad["tipo_novedad"] = df["nombre"]
-    
+    df_dim_novedad = df_dim_novedad.sort_values('id_tipo_novedad')
     return df_dim_novedad
 
 
@@ -77,7 +77,7 @@ def transform_fecha() -> pd.DataFrame:
     dim_tiempo["mes"] = dim_tiempo["fecha"].dt.month
     dim_tiempo["dia"] = dim_tiempo["fecha"].dt.day
     dim_tiempo["dia_semana"] = dim_tiempo["fecha"].dt.weekday
-    dim_tiempo["fin_de_semana"] = np.where(dim_tiempo["dia_semana"].isin([5, 6]), 1, 0)
+    dim_tiempo["fin_de_semana"] = np.where(dim_tiempo["dia_semana"].isin([5, 6]), True, False)
     
     
     return dim_tiempo
@@ -90,42 +90,82 @@ def transform_hora() -> pd.DataFrame:
     
     return dim_hora
 
-def transform_hecho_novedad(df_novedad: pd.DataFrame, dim_tiempo: pd.DataFrame) -> pd.DataFrame:
+def transform_hecho_novedad(df_novedad: pd.DataFrame, 
+                            dim_tiempo: pd.DataFrame, 
+                            dim_mensajero: pd.DataFrame, 
+                            dim_novedad: pd.DataFrame,
+                            dim_hora: pd.DataFrame) -> pd.DataFrame:
+    
 
     hecho = pd.DataFrame()
-
     hecho["id_novedad_servicio"] = df_novedad["id"]
-    hecho["id_tipo_novedad"] = df_novedad["tipo_novedad_id"]
+    hecho["id_novedad"] = df_novedad["tipo_novedad_id"]
     hecho["id_mensajero"] = df_novedad["mensajero_id"]
-    hecho["fecha"] = pd.to_datetime(df_novedad["fecha_novedad"], utc=True).dt.tz_convert(None).dt.normalize()    
-    hecho = hecho.merge(dim_tiempo[["fecha", "id_tiempo"]],on="fecha", how="left")
+    hecho["fecha"] = pd.to_datetime(df_novedad["fecha_novedad"], utc=True).dt.tz_convert(None).dt.normalize()
+    
+
     hecho["id_hora"] = pd.to_datetime(df_novedad["fecha_novedad"]).dt.hour
-    hecho["cod_servicio"] = df_novedad["servicio_id"]
+    
 
-  
-    hecho["cantidad_novedades"] = 1
+    hecho = hecho.merge(
+        dim_hora[["key_dim_hora", "id_hora"]], 
+        on="id_hora", 
+        how="left"
+    )
 
-
-    return hecho
+    hecho = hecho.merge(
+        dim_novedad[["key_dim_tipo_novedad", "id_tipo_novedad"]], 
+        left_on="id_novedad", 
+        right_on="id_tipo_novedad", 
+        how="left"
+    )
+    
+    
+    hecho = hecho.merge(
+        dim_mensajero[["key_dim_mensajero", "id_mensajero"]], 
+        left_on="id_mensajero", 
+        right_on="id_mensajero", 
+        how="left"
+    )
+    
+   
+    dim_tiempo_copy = dim_tiempo.copy()
+    dim_tiempo_copy["fecha"] = pd.to_datetime(dim_tiempo_copy["fecha"]).dt.normalize()
+    
+    hecho = hecho.merge(
+        dim_tiempo_copy[["key_dim_tiempo", "fecha"]], 
+        on="fecha", 
+        how="left"
+    )
+    
+   
+    hecho_final = pd.DataFrame({
+        "key_dim_tipo_novedad": hecho["key_dim_tipo_novedad"],
+        "key_dim_mensajero": hecho["key_dim_mensajero"],
+        "key_dim_tiempo": hecho["key_dim_tiempo"],
+        "key_dim_hora": hecho["key_dim_hora"],  
+        "cod_servicio": df_novedad["servicio_id"],
+        "cantidad_novedades": 1
+    })
+    
+    return hecho_final
 
 
 def transform_hecho_seguimiento_estado(args, dim_tiempo: pd.DataFrame) -> pd.DataFrame:
     df, servicios = args
     df = df.copy()
     
-    # traer mensajero_id desde mensajeria_servicio
+
     df = df.merge(servicios[['id', 'mensajero_id']], left_on='servicio_id', right_on='id', how='left')
     df['mensajero_id'] = df['mensajero_id'].fillna(0).astype(int)
     
-    # combinar fecha y hora en un datetime
+
     df['datetime'] = pd.to_datetime(df['fecha'].astype(str) + ' ' + df['hora'].astype(str), format='mixed')    
-    # ordenar por servicio y datetime
+   
     df = df.sort_values(['servicio_id', 'datetime']).reset_index(drop=True)
-    
-    # calcular datetime_fin
+
     df['datetime_fin'] = df.groupby('servicio_id')['datetime'].shift(-1)
     
-    # duracion en minutos
     df['duracion_tiempo_estado'] = (
         (df['datetime_fin'] - df['datetime'])
         .dt.total_seconds()
@@ -134,23 +174,20 @@ def transform_hecho_seguimiento_estado(args, dim_tiempo: pd.DataFrame) -> pd.Dat
         .astype(int)
     )
     
-    # join dim_tiempo para inicio
+
     dim_tiempo_join = dim_tiempo[['id_tiempo', 'fecha']].copy()
     dim_tiempo_join['fecha'] = pd.to_datetime(dim_tiempo_join['fecha'])
     
     df['fecha_inicio'] = df['datetime'].dt.normalize()
     df = df.merge(dim_tiempo_join, left_on='fecha_inicio', right_on='fecha', how='left')
     df = df.rename(columns={'id_tiempo': 'id_tiempo_estado_inicio'})
-    
-    # join dim_tiempo para fin
+
     df['fecha_fin'] = df['datetime_fin'].dt.normalize()
     df = df.merge(dim_tiempo_join, left_on='fecha_fin', right_on='fecha', how='left')
     df = df.rename(columns={'id_tiempo': 'id_tiempo_estado_fin'})
     
-    # ultimo estado sin fin
     df['id_tiempo_estado_fin'] = df['id_tiempo_estado_fin'].fillna(1).astype(int)
     
-    # construir hecho final
     hecho = pd.DataFrame()
     hecho['id_estado_servicio']      = df['id_x']  
     hecho['id_estado']               = df['estado_id']

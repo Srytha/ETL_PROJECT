@@ -12,3 +12,4 @@ venv
 .yml
 .venv
 config_fill.yml
+config.yml
