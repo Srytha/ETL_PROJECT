@@ -79,26 +79,25 @@ hecho_novedad: |
 
 hecho_seguimiento_estado: |
   CREATE TABLE IF NOT EXISTS data_mart_entregas.hecho_seguimiento_estado (
-      id_estado_servicio INT PRIMARY KEY,
-      id_estado INT,
-      id_mensajero INT,
-      id_tiempo_estado_inicio INT,
-      id_tiempo_estado_fin INT,
+      key_hecho_seguimiento SERIAL PRIMARY KEY,
+      key_dim_estado INT REFERENCES dim_estado(key_dim_estado),
+      key_dim_mensajero INT REFERENCES dim_mensajero(key_dim_mensajero),
+      key_dim_tiempo_inicio INT REFERENCES dim_tiempo(key_dim_tiempo),
+      key_dim_tiempo_fin INT REFERENCES dim_tiempo(key_dim_tiempo),
       duracion_tiempo_estado INT,
-      id_hora INT,
+      key_dim_hora INT REFERENCES dim_hora(key_dim_hora),
       cod_servicio INT
   );
 
 hecho_servicio: |
   CREATE TABLE IF NOT EXISTS data_mart_entregas.hecho_servicio (
-      id_hecho_servicio INT PRIMARY KEY,
-      id_cliente INT,
-      id_sede INT,
-      id_tiempo INT,
-      id_hora INT,
-      id_mensajero INT,
+      key_hecho_servicio SERIAL PRIMARY KEY,
+      key_dim_cliente INT REFERENCES dim_cliente(key_dim_cliente),
+      key_dim_sede INT REFERENCES dim_sede(key_dim_sede),
+      key_dim_tiempo INT REFERENCES dim_tiempo(key_dim_tiempo),
+      key_dim_hora INT REFERENCES dim_hora(key_dim_hora),
+      key_dim_mensajero INT REFERENCES dim_mensajero(key_dim_mensajero),
       cod_servicio INT,
       duracion_servicio INT,
       total_servicios INT
   );
-

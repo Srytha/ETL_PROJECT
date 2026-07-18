@@ -1,6 +1,7 @@
 # utils.py
 import pandas as pd
 from sqlalchemy.engine import Engine
+from sqlalchemy import text
 
 def recargar_dimensiones(dw_conn: Engine) -> dict:
     """
@@ -21,6 +22,6 @@ def recargar_dimensiones(dw_conn: Engine) -> dict:
     for tabla, columnas in dims.items():
         query = f"SELECT {', '.join(columnas)} FROM {tabla}"
         dimensiones[tabla] = pd.read_sql(query, dw_conn)
-        print(f"Recargada {tabla} con {len(dimensiones[tabla])} registros")
-    
+   
     return dimensiones
+
