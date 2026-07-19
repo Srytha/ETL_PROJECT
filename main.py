@@ -4,7 +4,7 @@ import pandas as pd
 from sqlalchemy import create_engine, inspect
 from etl import extract, transform, load
 from sqlalchemy import text
-from etl.utils import recargar_dimensiones 
+from etl.utils import recargar_dimensiones
 
 pd.set_option('display.max_rows', 100)
 pd.set_option('display.max_columns', 100)
@@ -91,7 +91,7 @@ dim_novedad = dims['dim_novedad']
 # Hecho Seguimiento
 df_seguimiento, df_servicios = extract.extract_hecho_seguimiento_estado(source_conn)
 dim_tiempo_df = transform.transform_fecha()
-hecho_seguimiento = transform.transform_hecho_seguimiento_estado([df_seguimiento, df_servicios], dim_tiempo_df)
+hecho_seguimiento = transform.transform_hecho_seguimiento_estado([df_seguimiento, df_servicios],dim_tiempo, dim_mensajero,dim_estado, dim_hora )
 load.load_hecho_seguimiento_estado(hecho_seguimiento, dw_conn)
 print("Hecho seguimiento estado completado :v")
 
@@ -105,12 +105,12 @@ print("Hecho novedad completado :v")
 df_servicio, df_usuario = extract.extract_hecho_servicio(source_conn)
 df_estados, df_servicios = extract.extract_hecho_seguimiento_estado(source_conn)
 dim_tiempo_df = transform.transform_fecha()
-hecho_servicio = transform.transform_hecho_servicio([df_servicio, df_usuario, df_estados], dim_tiempo_df)
+hecho_servicio = transform.transform_hecho_servicio([df_servicio, df_usuario, df_estados], dim_tiempo, dim_cliente,dim_sede,dim_mensajero,dim_hora)
 load.load_hecho_servicio(hecho_servicio, dw_conn)
 print("Hecho servicio completado :v")
 
 
-print("\nVerificando registros en las tablas...")
+
 with dw_conn.connect() as conn:
     tablas = [
         'dim_cliente',
