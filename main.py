@@ -44,6 +44,22 @@ with open('sqlscripts.yml', 'r', encoding='utf-8') as f:
             cur.execute(val)
             conn.commit()
 
+# Vaciar las tablas para evitar conflictos de llave foránea al recargar
+with dw_conn.begin() as transaction_conn:
+    transaction_conn.execute(text("""
+        TRUNCATE TABLE 
+            data_mart_novedades.hecho_novedad, 
+            data_mart_entregas.hecho_seguimiento_estado, 
+            data_mart_entregas.hecho_servicio, 
+            dim_cliente, 
+            dim_sede, 
+            dim_estado, 
+            dim_mensajero, 
+            dim_tiempo, 
+            dim_hora, 
+            dim_novedad 
+        RESTART IDENTITY CASCADE;
+    """))
 
 df_cliente = extract.extract_cliente(source_conn)
 dim_cliente = transform.transform_cliente(df_cliente)
