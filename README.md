@@ -81,7 +81,7 @@ docker exec -it etl_postgres psql -U postgres -c "CREATE DATABASE etl_mensajeria
    - Username: `postgres`
    - Password: `postgres`
 
-### config.yml for Docker
+### config.yml for Docker, if you want use Docker, is mandatory use this config.yml 
 
 ```yaml
 SOURCE_DB:
@@ -103,6 +103,18 @@ ETL_PRO:
 LOAD_DIMENSIONS:
   True
 ```
+
+### Config for create a local server in pgadmin:
+
+```txt
+Host name/address: postgres (el nombre del servicio en docker-compose, NO localhost y NO 5433)
+Port: 5432 (el puerto interno del contenedor, no el 5433 mapeado al host)
+Maintenance database: mensajeria
+Username: postgres
+Password: postgres
+(opcional) marca "Save password"
+```
+
 
 ### Stop and remove containers
 

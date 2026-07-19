@@ -64,7 +64,13 @@ def transform_mensajero(df_mensajero: pd.DataFrame) -> pd.DataFrame:
     df_dim_mensajero = pd.DataFrame()
     df_dim_mensajero["id_mensajero"] = df["id"]
     df_dim_mensajero["activo"] = df["activo"]
-    
+
+    fila_sin_asignar = pd.DataFrame({
+        "id_mensajero": [0],
+        "activo": [False]
+    })
+    df_dim_mensajero = pd.concat([fila_sin_asignar, df_dim_mensajero], ignore_index=True)
+
     return df_dim_mensajero
 
 def transform_fecha() -> pd.DataFrame:
@@ -101,7 +107,7 @@ def transform_hecho_novedad(df_novedad: pd.DataFrame,
     hecho = pd.DataFrame()
     hecho["id_novedad_servicio"] = df_novedad["id"]
     hecho["id_novedad"] = df_novedad["tipo_novedad_id"]
-    hecho["id_mensajero"] = df_novedad["mensajero_id"]
+    hecho["id_mensajero"] = df_novedad["mensajero_id"].fillna(0).astype(int)
     hecho["fecha"] = pd.to_datetime(df_novedad["fecha_novedad"], utc=True).dt.tz_convert(None).dt.normalize()
     
 
