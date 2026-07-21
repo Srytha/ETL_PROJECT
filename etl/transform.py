@@ -82,10 +82,22 @@ def transform_fecha() -> pd.DataFrame:
     dim_tiempo["id_tiempo"] = range(1, len(dim_tiempo) + 1)
     dim_tiempo["año"] = dim_tiempo["fecha"].dt.year
     dim_tiempo["mes"] = dim_tiempo["fecha"].dt.month
-    dim_tiempo["dia"] = dim_tiempo["fecha"].dt.day
-    dim_tiempo["dia_semana"] = dim_tiempo["fecha"].dt.weekday
-    dim_tiempo["fin_de_semana"] = np.where(dim_tiempo["dia_semana"].isin([5, 6]), True, False)
     
+    meses_es = {
+        1: "Enero", 2: "Febrero", 3: "Marzo", 4: "Abril", 5: "Mayo", 6: "Junio",
+        7: "Julio", 8: "Agosto", 9: "Septiembre", 10: "Octubre", 11: "Noviembre", 12: "Diciembre"
+    }
+    dim_tiempo["nombre_mes"] = dim_tiempo["mes"].map(meses_es)
+    
+    dim_tiempo["dia"] = dim_tiempo["fecha"].dt.day
+    dim_tiempo["dia_semana"] = dim_tiempo["fecha"].dt.weekday + 1
+    
+    dias_es = {
+        1: "Lunes", 2: "Martes", 3: "Miércoles", 4: "Jueves", 5: "Viernes", 6: "Sábado", 7: "Domingo"
+    }
+    dim_tiempo["nombre_dia"] = dim_tiempo["dia_semana"].map(dias_es)
+    
+    dim_tiempo["fin_de_semana"] = np.where(dim_tiempo["dia_semana"].isin([6, 7]), True, False)
     
     return dim_tiempo
 

@@ -12,8 +12,8 @@ pd.set_option('display.max_columns', 100)
 # Conexion a base de datos
 with open('config.yml', 'r', encoding='utf-8') as f:
     config = yaml.safe_load(f)
-    config_source = config['SOURCE_DB']
-    config_dw = config['ETL_PRO']
+    config_source = config['mensajeria_bd']
+    config_dw = config['etl_mensajeria']
 
 url_source = (
     f"{config_source['drivername']}://{config_source['user']}:{config_source['password']}@"
@@ -38,6 +38,22 @@ conn = psycopg2.connect(
     )
 
 cur = conn.cursor()
+
+# Eliminar tablas existentes para aplicar posibles cambios en el esquema
+cur.execute("""
+    DROP TABLE IF EXISTS data_mart_novedades.hecho_novedad CASCADE;
+    DROP TABLE IF EXISTS data_mart_entregas.hecho_seguimiento_estado CASCADE;
+    DROP TABLE IF EXISTS data_mart_entregas.hecho_servicio CASCADE;
+    DROP TABLE IF EXISTS dim_cliente CASCADE;
+    DROP TABLE IF EXISTS dim_sede CASCADE;
+    DROP TABLE IF EXISTS dim_estado CASCADE;
+    DROP TABLE IF EXISTS dim_mensajero CASCADE;
+    DROP TABLE IF EXISTS dim_tiempo CASCADE;
+    DROP TABLE IF EXISTS dim_hora CASCADE;
+    DROP TABLE IF EXISTS dim_novedad CASCADE;
+""")
+conn.commit()
+
 with open('sqlscripts.yml', 'r', encoding='utf-8') as f:
         sql = yaml.safe_load(f)
         for val in sql.values():

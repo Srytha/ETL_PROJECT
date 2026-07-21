@@ -23,7 +23,7 @@ pd.set_option('display.width', 120)
 def get_dw_engine():
     with open('config.yml', 'r', encoding='utf-8') as f:
         config = yaml.safe_load(f)
-        config_dw = config['ETL_PRO']
+        config_dw = config['etl_mensajeria']
 
     url_dw = (
         f"{config_dw['drivername']}://{config_dw['user']}:{config_dw['password']}@"
@@ -34,18 +34,18 @@ def get_dw_engine():
 
 CONSULTAS = {
     "1) Meses con más servicios solicitados": """
-        SELECT t.mes, COUNT(*) AS total_servicios
+        SELECT t.mes, t.nombre_mes, COUNT(*) AS total_servicios
         FROM data_mart_entregas.hecho_servicio h
         JOIN dim_tiempo t ON h.key_dim_tiempo = t.key_dim_tiempo
-        GROUP BY t.mes
+        GROUP BY t.mes, t.nombre_mes
         ORDER BY total_servicios DESC;
     """,
 
     "2) Días de la semana con más solicitudes": """
-        SELECT t.dia_semana, COUNT(*) AS total_servicios
+        SELECT t.dia_semana, t.nombre_dia, COUNT(*) AS total_servicios
         FROM data_mart_entregas.hecho_servicio h
         JOIN dim_tiempo t ON h.key_dim_tiempo = t.key_dim_tiempo
-        GROUP BY t.dia_semana
+        GROUP BY t.dia_semana, t.nombre_dia
         ORDER BY total_servicios DESC;
     """,
 
@@ -60,11 +60,11 @@ CONSULTAS = {
     """,
 
     "4) Servicios solicitados por cliente y por mes": """
-        SELECT c.nombre_cliente, t.mes, COUNT(*) AS total_servicios
+        SELECT c.nombre_cliente, t.mes, t.nombre_mes, COUNT(*) AS total_servicios
         FROM data_mart_entregas.hecho_servicio h
         JOIN dim_cliente c ON h.key_dim_cliente = c.key_dim_cliente
         JOIN dim_tiempo t ON h.key_dim_tiempo = t.key_dim_tiempo
-        GROUP BY c.nombre_cliente, t.mes
+        GROUP BY c.nombre_cliente, t.mes, t.nombre_mes
         ORDER BY c.nombre_cliente, t.mes;
     """,
 
