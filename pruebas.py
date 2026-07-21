@@ -50,13 +50,14 @@ CONSULTAS = {
     """,
 
     "3) Hora en que los mensajeros están más ocupados": """
-        SELECT hr.hora, COUNT(*) AS eventos
-        FROM data_mart_entregas.hecho_seguimiento_estado h
+        SELECT hr.hora, SUM(h.total_servicios) AS total_servicios
+        FROM data_mart_entregas.hecho_servicio h
         JOIN dim_hora hr ON h.key_dim_hora = hr.key_dim_hora
         JOIN dim_mensajero m ON h.key_dim_mensajero = m.key_dim_mensajero
         WHERE m.id_mensajero != 0
         GROUP BY hr.hora
-        ORDER BY eventos DESC;
+        ORDER BY total_servicios DESC;
+
     """,
 
     "4) Servicios solicitados por cliente y por mes": """
