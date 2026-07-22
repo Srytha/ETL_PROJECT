@@ -2,7 +2,7 @@ SOURCE_DB:
   drivername: postgresql
   dbname: mensajeria
   user: postgres
-  password: 'sara123'
+  password: 
   host: localhost
   port: 5432
 
@@ -10,7 +10,7 @@ ETL_PRO:
   drivername: postgresql
   dbname: etl_mensajeria
   user: postgres
-  password: 'sara123'
+  password: 
   host: localhost
   port: 5432
 

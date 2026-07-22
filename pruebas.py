@@ -23,7 +23,7 @@ pd.set_option('display.width', 120)
 def get_dw_engine():
     with open('config.yml', 'r', encoding='utf-8') as f:
         config = yaml.safe_load(f)
-        config_dw = config['etl_mensajeria']
+        config_dw = config['ETL_PRO']
 
     url_dw = (
         f"{config_dw['drivername']}://{config_dw['user']}:{config_dw['password']}@"

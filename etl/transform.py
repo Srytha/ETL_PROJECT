@@ -242,11 +242,7 @@ def transform_hecho_seguimiento_estado(args, dim_tiempo: pd.DataFrame,
     hecho['duracion_tiempo_estado'] = df['duracion_tiempo_estado']
     hecho['key_dim_hora'] = df['key_dim_hora']
     hecho['cod_servicio'] = df['servicio_id']
-    
-    print(f"Registros procesados: {len(hecho)}")
-    print(f"Con mensajero: {len(hecho[hecho['key_dim_mensajero'].notna()])}")
-    print(f"Sin mensajero (NULL): {len(hecho[hecho['key_dim_mensajero'].isna()])}")
-    
+
     return hecho
 
 def transform_hecho_servicio(args, dim_tiempo: pd.DataFrame, 
@@ -258,13 +254,11 @@ def transform_hecho_servicio(args, dim_tiempo: pd.DataFrame,
 
     df = pd.merge(servicio, usuario[['id', 'sede_id']], left_on='usuario_id', right_on='id', how='left')
 
-    #Crea datetime de solicitud
     df['datetime_solicitud'] = pd.to_datetime(
         df['fecha_solicitud'].astype(str) + ' ' + df['hora_solicitud'].astype(str),
         format='mixed'
     )
 
-    #Calcula duracion del servicio
     estados['fecha_str'] = pd.to_datetime(estados['fecha']).dt.strftime('%Y-%m-%d')
     estados['hora_str'] = estados['hora'].astype(str).str.split('.').str[0]
     estados['datetime'] = pd.to_datetime(
@@ -283,7 +277,6 @@ def transform_hecho_servicio(args, dim_tiempo: pd.DataFrame,
         .astype(int)
     )
 
-    # Mapear fecha a key_dim_tiempo
     dim_tiempo_join = dim_tiempo[['key_dim_tiempo', 'fecha']].copy()
     dim_tiempo_join['fecha'] = pd.to_datetime(dim_tiempo_join['fecha'])
     df['fecha_solicitud_norm'] = pd.to_datetime(df['fecha_solicitud']).dt.normalize()
@@ -291,7 +284,6 @@ def transform_hecho_servicio(args, dim_tiempo: pd.DataFrame,
     df['key_dim_tiempo'] = df['key_dim_tiempo'].fillna(1).astype(int)
 
 
-    # Mapear hora a key_dim_hora
     df['id_hora'] = df['datetime_solicitud'].dt.hour
     df = df.merge(
         dim_hora[['key_dim_hora', 'id_hora']],
@@ -302,7 +294,6 @@ def transform_hecho_servicio(args, dim_tiempo: pd.DataFrame,
     df['key_dim_hora'] = df['key_dim_hora'].fillna(1).astype(int)
 
 
-    # Mapear cliente a key_dim_cliente
     df = df.merge(
         dim_cliente[['key_dim_cliente', 'id_cliente']],
         left_on='cliente_id',
@@ -312,7 +303,6 @@ def transform_hecho_servicio(args, dim_tiempo: pd.DataFrame,
     df['key_dim_cliente'] = df['key_dim_cliente'].fillna(0).astype(int)
 
 
-     # Mapear sede a key_dim_sede
     df = df.merge(
         dim_sede[['key_dim_sede', 'id_sede']],
         left_on='sede_id',
@@ -321,7 +311,6 @@ def transform_hecho_servicio(args, dim_tiempo: pd.DataFrame,
     )
     df['key_dim_sede'] = df['key_dim_sede'].fillna(0).astype(int)
 
-    # Mapear mensajero a key_dim_mensajero
     df['mensajero_id'] = df['mensajero_id'].fillna(0).astype(int)
     df = df.merge(
         dim_mensajero[['key_dim_mensajero', 'id_mensajero']],
