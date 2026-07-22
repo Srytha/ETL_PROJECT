@@ -208,9 +208,8 @@ def transform_hecho_seguimiento_estado(args, dim_tiempo: pd.DataFrame,
         (df['datetime_fin'] - df['datetime'])
         .dt.total_seconds()
         .div(60)
-        .fillna(0)
-        .astype(int)
-    )
+        .round()
+    ).astype('Int64')
     
     dim_tiempo_join = dim_tiempo[['key_dim_tiempo', 'fecha']].copy()
     dim_tiempo_join['fecha'] = pd.to_datetime(dim_tiempo_join['fecha'])
@@ -273,18 +272,16 @@ def transform_hecho_servicio(args, dim_tiempo: pd.DataFrame,
         format='%Y-%m-%d %H:%M:%S'
     )
 
-    duracion = estados.groupby('servicio_id')['datetime'].agg(
-        inicio='min', fin='max'
-    ).reset_index()
-    duracion['duracion_servicio'] = (
-        (duracion['fin'] - duracion['inicio'])
+    cierre = estados.groupby('servicio_id')['datetime'].max().reset_index(name='cierre')
+    df = pd.merge(df, cierre, left_on='id_x', right_on='servicio_id', how='left')
+    df['duracion_servicio'] = (
+        (df['cierre'] - df['datetime_solicitud'])
         .dt.total_seconds()
         .div(60)
         .fillna(0)
         .round()
         .astype(int)
     )
-    df = pd.merge(df, duracion[['servicio_id', 'duracion_servicio']], left_on='id_x', right_on='servicio_id', how='left')
 
     # Mapear fecha a key_dim_tiempo
     dim_tiempo_join = dim_tiempo[['key_dim_tiempo', 'fecha']].copy()

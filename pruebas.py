@@ -95,11 +95,11 @@ CONSULTAS = {
     """,
 
     "8) Tiempo de espera promedio por fase del servicio": """
-        SELECT e.nombre_estado, ROUND(AVG(h.duracion_tiempo_estado), 2) AS minutos_promedio
+        SELECT TRIM(e.nombre_estado) AS fase_servicio, ROUND(AVG(h.duracion_tiempo_estado), 2) AS minutos_promedio
         FROM data_mart_entregas.hecho_seguimiento_estado h
         JOIN dim_estado e ON h.key_dim_estado = e.key_dim_estado
-        WHERE h.duracion_tiempo_estado > 0
-        GROUP BY e.nombre_estado
+        WHERE TRIM(e.nombre_estado) IN ('Iniciado', 'Con mensajero Asignado', 'Recogido por mensajero', 'Entregado en destino', 'Terminado completo')
+        GROUP BY TRIM(e.nombre_estado)
         ORDER BY minutos_promedio DESC;
     """,
 
