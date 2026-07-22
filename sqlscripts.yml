@@ -38,8 +38,10 @@ dim_tiempo: |
       fecha DATE,
       año INT,
       mes INT,
+      nombre_mes VARCHAR(20),
       dia INT,
       dia_semana INT,
+      nombre_dia VARCHAR(20),
       fin_de_semana BOOLEAN
   );
 
