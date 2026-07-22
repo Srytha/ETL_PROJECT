@@ -3,125 +3,100 @@ crear_esquemas: |
   CREATE SCHEMA IF NOT EXISTS data_mart_novedades;
 
 dim_cliente: |
-  CREATE TABLE IF NOT EXISTS data_mart_entregas.dim_cliente (
-      id_cliente INT PRIMARY KEY,
+  CREATE TABLE IF NOT EXISTS dim_cliente (
+      key_dim_cliente SERIAL PRIMARY KEY,
+      id_cliente INT,
       nombre_cliente VARCHAR(100),
       tipo_cliente VARCHAR(50),
       email VARCHAR(100),
       telefono VARCHAR(30),
-      sector VARCHAR(100),
-      saved DATE
+      sector VARCHAR(100)
   );
 
 dim_sede: |
-  CREATE TABLE IF NOT EXISTS data_mart_entregas.dim_sede (
-      id_sede INT PRIMARY KEY,
+  CREATE TABLE IF NOT EXISTS dim_sede (
+      key_dim_sede SERIAL PRIMARY KEY,
+      id_sede INT,
       nombre_sede VARCHAR(100),
       ciudad VARCHAR(100),
       departamento VARCHAR(100),
-      direccion VARCHAR(200),
-      saved DATE
+      direccion VARCHAR(200)
   );
 
 dim_estado: |
-  CREATE TABLE IF NOT EXISTS data_mart_entregas.dim_estado (
-      id_estado INT PRIMARY KEY,
+  CREATE TABLE IF NOT EXISTS dim_estado (
+      key_dim_estado SERIAL PRIMARY KEY,
+      id_estado INT,
       nombre_estado VARCHAR(100),
-      descripcion VARCHAR(200),
-      saved DATE
+      descripcion VARCHAR(200)
   );
 
 dim_tiempo: |
-  CREATE TABLE IF NOT EXISTS data_mart_entregas.dim_tiempo (
-      id_tiempo INT PRIMARY KEY,
+  CREATE TABLE IF NOT EXISTS dim_tiempo (
+      key_dim_tiempo SERIAL PRIMARY KEY,
+      id_tiempo INT,
       fecha DATE,
       año INT,
       mes INT,
-      semana INT,
       dia INT,
-      fin_de_semana BOOLEAN,
-      saved DATE
+      dia_semana INT,
+      fin_de_semana BOOLEAN
   );
 
 dim_hora: |
-  CREATE TABLE IF NOT EXISTS data_mart_entregas.dim_hora (
-      id_hora INT PRIMARY KEY,
-      hora INT,
-      saved DATE
+  CREATE TABLE IF NOT EXISTS dim_hora (
+      key_dim_hora SERIAL PRIMARY KEY,
+      id_hora INT,
+      hora INT
   );
 
-dim_hora_novedades: |
-  CREATE TABLE IF NOT EXISTS data_mart_novedades.dim_hora (
-      id_hora INT PRIMARY KEY,
-      hora INT,
-      saved DATE
-  );  
-
 dim_mensajero: |
-  CREATE TABLE IF NOT EXISTS data_mart_entregas.dim_mensajero (
-      id_mensajero INT PRIMARY KEY,
-      activo BOOLEAN,
-      saved DATE
+  CREATE TABLE IF NOT EXISTS dim_mensajero (
+      key_dim_mensajero SERIAL PRIMARY KEY,
+      id_mensajero INT,
+      activo BOOLEAN
   );
 
 dim_novedad: |
-  CREATE TABLE IF NOT EXISTS data_mart_novedades.dim_novedad (
-      id_tipo_novedad INT PRIMARY KEY,
-      tipo_novedad VARCHAR(100),
-      saved DATE
+  CREATE TABLE IF NOT EXISTS dim_novedad (
+      key_dim_tipo_novedad SERIAL PRIMARY KEY,
+      id_tipo_novedad INT,
+      tipo_novedad VARCHAR(100)
   );
 
-dim_mensajero_novedades: |
-  CREATE TABLE IF NOT EXISTS data_mart_novedades.dim_mensajero (
-      id_mensajero INT PRIMARY KEY,
-      activo BOOLEAN,
-      saved DATE
-  );
-
-dim_tiempo_novedades: |
-  CREATE TABLE IF NOT EXISTS data_mart_novedades.dim_tiempo (
-      id_tiempo INT PRIMARY KEY,
-      fecha DATE,
-      año INT,
-      mes INT,
-      semana INT,
-      dia INT,
-      fin_de_semana BOOLEAN,
-      saved DATE
-  );
 
 hecho_novedad: |
   CREATE TABLE IF NOT EXISTS data_mart_novedades.hecho_novedad (
-      id_novedad_servicio INT PRIMARY KEY,
-      id_tipo_novedad INT,
-      id_mensajero INT,
-      id_tiempo INT,
-      id_hora INT,
+      key_hecho_novedad SERIAL PRIMARY KEY,
+      key_dim_tipo_novedad INT REFERENCES dim_novedad(key_dim_tipo_novedad),
+      key_dim_mensajero INT REFERENCES dim_mensajero(key_dim_mensajero),
+      key_dim_tiempo INT REFERENCES dim_tiempo(key_dim_tiempo),
+      key_dim_hora INT REFERENCES dim_hora(key_dim_hora),
       cod_servicio INT,
-      cantidad_novedades INT,
-      saved DATE
+      cantidad_novedades INT
+
   );
 
 hecho_seguimiento_estado: |
   CREATE TABLE IF NOT EXISTS data_mart_entregas.hecho_seguimiento_estado (
-      id_estado_servicio INT PRIMARY KEY,
-      id_estado INT,
-      id_mensajero INT,
-      id_tiempo_estado_inicio INT,
-      id_tiempo_estado_fin INT,
+      key_hecho_seguimiento SERIAL PRIMARY KEY,
+      key_dim_estado INT REFERENCES dim_estado(key_dim_estado),
+      key_dim_mensajero INT REFERENCES dim_mensajero(key_dim_mensajero),
+      key_dim_tiempo_inicio INT REFERENCES dim_tiempo(key_dim_tiempo),
+      key_dim_tiempo_fin INT REFERENCES dim_tiempo(key_dim_tiempo),
       duracion_tiempo_estado INT,
-      id_hora INT,
+      key_dim_hora INT REFERENCES dim_hora(key_dim_hora),
       cod_servicio INT
   );
 
 hecho_servicio: |
   CREATE TABLE IF NOT EXISTS data_mart_entregas.hecho_servicio (
-      id_hecho_servicio INT PRIMARY KEY,
-      id_cliente INT,
-      id_sede INT,
-      id_tiempo INT,
-      id_hora INT,
-      id_mensajero INT,
+      key_hecho_servicio SERIAL PRIMARY KEY,
+      key_dim_cliente INT REFERENCES dim_cliente(key_dim_cliente),
+      key_dim_sede INT REFERENCES dim_sede(key_dim_sede),
+      key_dim_tiempo INT REFERENCES dim_tiempo(key_dim_tiempo),
+      key_dim_hora INT REFERENCES dim_hora(key_dim_hora),
+      key_dim_mensajero INT REFERENCES dim_mensajero(key_dim_mensajero),
       cod_servicio INT,
       duracion_servicio INT,
       total_servicios INT
